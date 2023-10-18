@@ -1,55 +1,53 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  bio           String?
-  email         String      @unique
-  id            Int         @default(autoincrement()) @id
-  image         String?
-  password      String?
-  username      String?     @unique
-  articles      Article[]   @relation("UserArticles")
-  favorites     Article[]   @relation("UserFavorites", references: [id])
-  followedBy    User[]      @relation("UserFollows", references: [id])
-  following     User[]      @relation("UserFollows", references: [id])
+  bio       String?
+  email     String    @unique
+  id        Int       @id @default(autoincrement())
+  image     String?
+  password  String?
+  username  String?   @unique
+  articles  Article[] @relation("UserArticles")
+  Comment   Comment[]
+  favorites Article[] @relation("UserFavorites")
+  User_A    User[]    @relation("UserFollows")
+  User_B    User[]    @relation("UserFollows")
 }
 
 model Article {
-  id            Int         @default(autoincrement()) @id
-  slug          String      @unique
-  title         String
-  description   String
-  body          String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @default(now())
-  tagList       String
-  author        User        @relation("UserArticles", fields: [authorId], references: [id])
-  authorId      Int
-  favoritedBy   User[]      @relation("UserFavorites", references: [id])
-  comments      Comment[]
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique
+  title       String
+  description String
+  body        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  tagList     String
+  authorId    Int
+  author      User      @relation("UserArticles", fields: [authorId], references: [id])
+  comments    Comment[]
+  favoritedBy User[]    @relation("UserFavorites")
 }
 
 model Comment {
-  id          Int         @default(autoincrement()) @id
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
-  body        String
-  article     Article     @relation(fields: [articleId], references: [id])
-  articleId   Int
-  author      User        @relation(fields: [authorId], references: [id])
-  authorId    Int
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  body      String
+  articleId Int
+  authorId  Int
+  article   Article  @relation(fields: [articleId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
 }
 
 model Tag {
-  id    Int     @default(autoincrement()) @id
-  name  String  @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 }
